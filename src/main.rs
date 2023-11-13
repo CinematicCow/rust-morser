@@ -60,37 +60,52 @@ fn main() {
         "Z".to_string(),
     ];
 
-    let choices: Vec<&str> = vec!["Encode", "Decode"];
+    println!(
+        r#"
+██████╗ ██╗   ██╗███████╗████████╗    ███╗   ███╗ ██████╗ ██████╗ ███████╗███████╗██████╗ 
+██╔══██╗██║   ██║██╔════╝╚══██╔══╝    ████╗ ████║██╔═══██╗██╔══██╗██╔════╝██╔════╝██╔══██╗
+██████╔╝██║   ██║███████╗   ██║       ██╔████╔██║██║   ██║██████╔╝███████╗█████╗  ██████╔╝
+██╔══██╗██║   ██║╚════██║   ██║       ██║╚██╔╝██║██║   ██║██╔══██╗╚════██║██╔══╝  ██╔══██╗
+██║  ██║╚██████╔╝███████║   ██║       ██║ ╚═╝ ██║╚██████╔╝██║  ██║███████║███████╗██║  ██║
+╚═╝  ╚═╝ ╚═════╝ ╚══════╝   ╚═╝       ╚═╝     ╚═╝ ╚═════╝ ╚═╝  ╚═╝╚══════╝╚══════╝╚═╝  ╚═╝
+"#
+    );
 
-    let selection = Select::new()
-        .with_prompt("What do you want to do?")
-        .items(&choices)
-        .interact()
-        .unwrap();
-
-    let message: String = Input::new()
-        .with_prompt("Enter your message")
-        .interact()
-        .unwrap();
+    let choices: Vec<&str> = vec!["Encode", "Decode", "Quit"];
 
     let decoder = Morse {
         morse_code: morse_key.into_iter().zip(letters.into_iter()).collect(),
     };
+    loop {
+        let selection = Select::new()
+            .with_prompt("What do you want to do?")
+            .items(&choices)
+            .interact()
+            .unwrap();
 
-    match selection {
-        0 => {
-            let encoded = decoder.encode_morse(&message.to_uppercase().trim());
+        match selection {
+            0 | 1 => {
+                let message: String = Input::new()
+                    .with_prompt("Enter your message")
+                    .interact()
+                    .unwrap();
 
-            println!(
-                "Your message: {:?}\nEncoded to Morse Code:\n{:?}",
-                message, encoded
-            )
+                match selection {
+                    0 => {
+                        let encoded = decoder.encode_morse(&message.to_uppercase().trim());
+                        println!("Encoded to Morse Code:\n{}", encoded)
+                    }
+                    1 => {
+                        let decoded = decoder.decode_morse(&message.to_uppercase().trim());
+                        println!("Decoded Morse Code:\n{}", decoded);
+                    }
+                    _ => unreachable!(),
+                }
+            }
+            2 => {
+                break;
+            }
+            _ => unreachable!(),
         }
-        1 => {
-            let decoded = decoder.decode_morse(&message.to_uppercase().trim());
-
-            println!("Decoded Morse Code:\n{:?}", decoded);
-        }
-        _ => unreachable!(),
     }
 }
